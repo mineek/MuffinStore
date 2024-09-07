@@ -53,13 +53,18 @@
 		installedGroupSpecifier.name = @"Installed Apps";
 		[_specifiers addObject:installedGroupSpecifier];
 
+		NSMutableArray *appSpecifiers = [NSMutableArray new];
 		[[LSApplicationWorkspace defaultWorkspace] enumerateApplicationsOfType:0 block:^(LSApplicationProxy* appProxy) {
 			PSSpecifier* appSpecifier = [PSSpecifier preferenceSpecifierNamed:appProxy.localizedName target:self set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
 			[appSpecifier setProperty:appProxy.bundleURL forKey:@"bundleURL"];
 			[appSpecifier setProperty:@YES forKey:@"enabled"];
 			appSpecifier.buttonAction = @selector(downloadAppShortcut:);
-			[_specifiers addObject:appSpecifier];
+			[appSpecifiers addObject:appSpecifier];
 		}];
+		[appSpecifiers sortUsingComparator:^NSComparisonResult(PSSpecifier* a, PSSpecifier* b) {
+			return [a.name compare:b.name];
+		}];
+		[_specifiers addObjectsFromArray:appSpecifiers];
 	}
 	[(UINavigationItem *)self.navigationItem setTitle:@"MuffinStore"];
 	return _specifiers;
@@ -107,7 +112,7 @@
 
 - (NSString*)getAboutText
 {
-	return @"MuffinStore v1.0\nMade by Mineek\nhttps://github.com/mineek/MuffinStore";
+	return @"MuffinStore v1.1\nMade by Mineek\nhttps://github.com/mineek/MuffinStore";
 }
 
 - (void)showAlert:(NSString*)title message:(NSString*)message
@@ -256,39 +261,9 @@
 		[self showAlert:@"Error" message:@"Invalid link"];
 		return;
 	}
-	NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/lookup?id=%@", targetAppIdParsed]];
-	NSURLRequest* request = [NSURLRequest requestWithURL:url];
-	NSURLSessionDataTask* task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
-		if(error)
-		{
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self showAlert:@"Error" message:error.localizedDescription];
-			});
-			return;
-		}
-		NSError* jsonError = nil;
-		NSDictionary* json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-		if(jsonError)
-		{
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self showAlert:@"JSON Error" message:jsonError.localizedDescription];
-			});
-			return;
-		}
-		NSArray* results = json[@"results"];
-		if(results.count == 0)
-		{
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self showAlert:@"Error" message:@"No results"];
-			});
-			return;
-		}
-		NSDictionary* app = results[0];
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self getAllAppVersionIdsAndPrompt:[app[@"trackId"] longLongValue]];
-		});
-	}];
-	[task resume];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self getAllAppVersionIdsAndPrompt:[targetAppIdParsed longLongValue]];
+	});
 }
 
 - (void)downloadApp
