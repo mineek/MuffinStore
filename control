@@ -1,0 +1,8 @@
+Package: dev.mineek.muffinstore
+Name: MuffinStore
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome application!
+Maintainer: Mineek
+Author: Mineek
+Section: Utilities

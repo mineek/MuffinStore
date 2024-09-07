@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>platform-application</key>
+	<true/>
+	<key>application-identifier</key>
+    <string>dev.mineek.muffinstore</string>
+	<key>com.apple.CommCenter.fine-grained</key>
+	<array>
+		<string>data-allowed-write</string>
+	</array>
+	<key>com.apple.private.security.container-required</key>
+	<true/>
+	<key>com.apple.private.coreservices.canmaplsdatabase</key>
+	<true/>
+	<key>com.apple.lsapplicationworkspace.rebuildappdatabases</key>
+	<true/>
+	<key>com.apple.itunesstored.private</key>
+	<true/>
+	<key>com.apple.private.uninstall.deletion</key>
+	<true/>
+	<key>SBAppUsesLocalNotifications</key>
+	<true/>
+	<key>com.apple.private.mobileinstall.allowedSPI</key>
+	<array>
+		<string>UninstallForLaunchServices</string>
+		<string>SetCapabilities</string>
+		<string>Lookup</string>
+	</array>
+	<key>com.apple.mobile.deleted.AllowFreeSpace</key>
+	<true/>
+	<key>com.apple.private.security.no-sandbox</key>
+	<true/>
+	<key>com.apple.private.security.container-manager</key>
+	<true/>
+	<key>com.apple.private.MobileContainerManager.allowed</key>
+	<true/>
+	<key>com.apple.private.security.storage.AppBundles</key>
+	<true/>
+	<key>com.apple.private.security.storage.MobileDocuments</key>
+	<true/>
+	<key>com.apple.private.security.storage-exempt.heritable</key>
+	<true/>
+	<key>com.apple.security.exception.files.absolute-path.read-write</key>
+	<array>
+		<string>/</string>
+	</array>
+	<key>com.apple.CommCenter.fine-grained</key>
+	<array>
+		<string>data-allowed-write</string>
+	</array>
+</dict>
+</plist>
