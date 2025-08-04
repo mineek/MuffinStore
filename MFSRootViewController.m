@@ -167,6 +167,13 @@
 			}
 			UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 			[versionAlert addAction:cancelAction];
+
+			// iPad fix
+			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+				versionAlert.popoverPresentationController.sourceView = self.view;
+				versionAlert.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 0, 0);
+			}
+
 			[self presentViewController:versionAlert animated:YES completion:nil];
 		});
 	}];
