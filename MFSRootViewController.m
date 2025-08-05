@@ -157,7 +157,7 @@
 			return;
 		}
 		dispatch_async(dispatch_get_main_queue(), ^{
-			UIAlertController* versionAlert = [UIAlertController alertControllerWithTitle:@"Version ID" message:@"Select the version ID of the app you want to download" preferredStyle:UIAlertControllerStyleAlert];
+			UIAlertController* versionAlert = [UIAlertController alertControllerWithTitle:@"Version ID" message:@"Select the version ID of the app you want to download" preferredStyle:UIAlertControllerStyleActionSheet];
 			for(NSDictionary* versionId in versionIds)
 			{
 				UIAlertAction* versionAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%@", versionId[@"bundle_version"]] style:UIAlertActionStyleDefault handler:^(UIAlertAction* action) {
@@ -167,6 +167,13 @@
 			}
 			UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 			[versionAlert addAction:cancelAction];
+
+			// iPad fix
+			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+				versionAlert.popoverPresentationController.sourceView = self.view;
+				versionAlert.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 0, 0);
+			}
+
 			[self presentViewController:versionAlert animated:YES completion:nil];
 		});
 	}];
