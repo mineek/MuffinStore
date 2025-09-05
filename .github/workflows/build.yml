@@ -1,0 +1,50 @@
+name: build and upload MuffinStore
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          brew install make ldid-procursus
+
+      - name: Download theos
+        uses: actions/checkout@v4
+        with:
+          repository: theos/theos
+          submodules: recursive
+          path: theos
+
+      - name: Setup theos
+        run: |
+          export THEOS=$GITHUB_WORKSPACE/theos
+          cd $THEOS
+          ./bin/install-sdk iPhoneOS16.5
+
+      - name: Switch Xcode version
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.2.0.app/Contents/Developer
+
+      - name: Build and Package MuffinStore
+        run: |
+          export THEOS=$GITHUB_WORKSPACE/theos
+          cd $GITHUB_WORKSPACE
+          FINALPACKAGE=1 gmake clean package
+          mkdir -p ./output
+          mv ./packages/*.ipa ./output/MuffinStore-$(git rev-parse --short HEAD).ipa
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MuffinStore IPA
+          path: ./output/*.ipa
