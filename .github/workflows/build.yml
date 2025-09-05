@@ -14,10 +14,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          brew install make
-
       - name: Setup theos
         uses: Randomblock1/theos-action@v1
 
