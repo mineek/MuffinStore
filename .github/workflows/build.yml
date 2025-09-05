@@ -16,20 +16,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install make ldid-procursus
-
-      - name: Download theos
-        uses: actions/checkout@v4
-        with:
-          repository: theos/theos
-          submodules: recursive
-          path: theos
+          brew install make
 
       - name: Setup theos
-        run: |
-          export THEOS=$GITHUB_WORKSPACE/theos
-          cd $THEOS
-          ./bin/install-sdk iPhoneOS16.5
+        uses: Randomblock1/theos-action@v1
 
       - name: Switch Xcode version
         run: |
@@ -37,7 +27,6 @@ jobs:
 
       - name: Build and Package MuffinStore
         run: |
-          export THEOS=$GITHUB_WORKSPACE/theos
           cd $GITHUB_WORKSPACE
           FINALPACKAGE=1 gmake clean package
           mkdir -p ./output
