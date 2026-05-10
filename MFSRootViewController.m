@@ -25,7 +25,7 @@
 @end
 
 @interface MFSRootViewController ()
-@property (nonatomic, strong) UIAlertController *progressAlert;
+@property (nonatomic, strong) UIAlertController* progressAlert;
 @end
 
 @implementation MFSRootViewController
@@ -36,45 +36,45 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadSpecifiers) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
-- (NSMutableArray *)specifiers
+- (NSMutableArray*)specifiers
 {
 	if (!_specifiers)
 	{
 		_specifiers = [NSMutableArray new];
 
-		PSSpecifier *downloadGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		PSSpecifier* downloadGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
 		downloadGroupSpecifier.name = @"Download";
 		[_specifiers addObject:downloadGroupSpecifier];
 
-		PSSpecifier *downloadSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Download" target:self set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
+		PSSpecifier* downloadSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Download" target:self set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
 		downloadSpecifier.identifier = @"download";
 		[downloadSpecifier setProperty:@YES forKey:@"enabled"];
 		downloadSpecifier.buttonAction = @selector(downloadApp);
 		[_specifiers addObject:downloadSpecifier];
 
-		NSString *aboutText = [self getAboutText];
+		NSString* aboutText = [self getAboutText];
 		[downloadGroupSpecifier setProperty:aboutText forKey:@"footerText"];
 
-		PSSpecifier *installedGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		PSSpecifier* installedGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
 		installedGroupSpecifier.name = @"Installed Apps";
 		[_specifiers addObject:installedGroupSpecifier];
 
-		NSMutableArray *appSpecifiers = [NSMutableArray new];
-		[[LSApplicationWorkspace defaultWorkspace] enumerateApplicationsOfType:0 block:^(LSApplicationProxy *appProxy)
+		NSMutableArray* appSpecifiers = [NSMutableArray new];
+		[[LSApplicationWorkspace defaultWorkspace] enumerateApplicationsOfType:0 block:^(LSApplicationProxy* appProxy)
 		{
-			PSSpecifier *appSpecifier = [PSSpecifier preferenceSpecifierNamed:appProxy.localizedName target:self set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
+			PSSpecifier* appSpecifier = [PSSpecifier preferenceSpecifierNamed:appProxy.localizedName target:self set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
 			[appSpecifier setProperty:appProxy.bundleURL forKey:@"bundleURL"];
 			[appSpecifier setProperty:@YES forKey:@"enabled"];
 			appSpecifier.buttonAction = @selector(downloadAppShortcut:);
 			[appSpecifiers addObject:appSpecifier];
 		}];
-		[appSpecifiers sortUsingComparator:^NSComparisonResult(PSSpecifier *a, PSSpecifier *b)
+		[appSpecifiers sortUsingComparator:^NSComparisonResult(PSSpecifier* a, PSSpecifier* b)
 		{
 			return [a.name compare:b.name];
 		}];
 		[_specifiers addObjectsFromArray:appSpecifiers];
 	}
-	[(UINavigationItem *)self.navigationItem setTitle:@"MuffinStore"];
+	[(UINavigationItem*)self.navigationItem setTitle:@"MuffinStore"];
 	return _specifiers;
 }
 
@@ -93,19 +93,19 @@
 	return reachable;
 }
 
-- (void)downloadAppShortcut:(PSSpecifier *)specifier
+- (void)downloadAppShortcut:(PSSpecifier*)specifier
 {
 	if (![self isNetworkReachable])
 	{
 		[self showAlert:@"No Internet" message:@"Please check your internet connection and try again."];
 		return;
 	}
-	NSURL *bundleURL = [specifier propertyForKey:@"bundleURL"];
-	NSDictionary *infoPlist = [NSDictionary dictionaryWithContentsOfFile:[bundleURL.path stringByAppendingPathComponent:@"Info.plist"]];
-	NSString *bundleId = infoPlist[@"CFBundleIdentifier"];
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/lookup?bundleId=%@&limit=1&media=software", bundleId]];
-	NSURLRequest *request = [NSURLRequest requestWithURL:url];
-	NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+	NSURL* bundleURL = [specifier propertyForKey:@"bundleURL"];
+	NSDictionary* infoPlist = [NSDictionary dictionaryWithContentsOfFile:[bundleURL.path stringByAppendingPathComponent:@"Info.plist"]];
+	NSString* bundleId = infoPlist[@"CFBundleIdentifier"];
+	NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/lookup?bundleId=%@&limit=1&media=software", bundleId]];
+	NSURLRequest* request = [NSURLRequest requestWithURL:url];
+	NSURLSessionDataTask* task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData* data, NSURLResponse* response, NSError* error)
 	{
 		if (error)
 		{
@@ -115,8 +115,8 @@
 			});
 			return;
 		}
-		NSError *jsonError = nil;
-		NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+		NSError* jsonError = nil;
+		NSDictionary* json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
 		if (jsonError)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^
@@ -125,7 +125,7 @@
 			});
 			return;
 		}
-		NSArray *results = json[@"results"];
+		NSArray* results = json[@"results"];
 		if (results.count == 0)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^
@@ -134,29 +134,29 @@
 			});
 			return;
 		}
-		NSDictionary *app = results[0];
+		NSDictionary* app = results[0];
 		[self getAllAppVersionIdsAndPrompt:[app[@"trackId"] longLongValue]];
 	}];
 	[task resume];
 }
 
-- (NSString *)getAboutText
+- (NSString*)getAboutText
 {
 	return @"MuffinStore v1.2\nMade by Mineek\nhttps://github.com/mineek/MuffinStore";
 }
 
-- (void)showAlert:(NSString *)title message:(NSString *)message
+- (void)showAlert:(NSString*)title message:(NSString*)message
 {
 	dispatch_async(dispatch_get_main_queue(), ^
 	{
-		UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-		UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+		UIAlertController* alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+		UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
 		[alert addAction:okAction];
 		[self presentViewController:alert animated:YES completion:nil];
 	});
 }
 
-- (void)showDownloadProgressWithMessage:(NSString *)message
+- (void)showDownloadProgressWithMessage:(NSString*)message
 {
 	dispatch_async(dispatch_get_main_queue(), ^
 	{
@@ -166,7 +166,7 @@
 			return;
 		}
 		self.progressAlert = [UIAlertController alertControllerWithTitle:@"Downloading" message:message preferredStyle:UIAlertControllerStyleAlert];
-		UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+		UIActivityIndicatorView* indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
 		indicator.translatesAutoresizingMaskIntoConstraints = NO;
 		[indicator startAnimating];
 		[self.progressAlert.view addSubview:indicator];
@@ -197,10 +197,10 @@
 		[self showAlert:@"No Internet" message:@"Please check your internet connection and try again."];
 		return;
 	}
-	NSString *serverURL = @"https://apis.bilin.eu.org/history/";
-	NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%lld", serverURL, appId]];
-	NSURLRequest *request = [NSURLRequest requestWithURL:url];
-	NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+	NSString* serverURL = @"https://apis.bilin.eu.org/history/";
+	NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%lld", serverURL, appId]];
+	NSURLRequest* request = [NSURLRequest requestWithURL:url];
+	NSURLSessionDataTask* task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData* data, NSURLResponse* response, NSError* error)
 	{
 		if (error)
 		{
@@ -210,8 +210,8 @@
 			});
 			return;
 		}
-		NSError *jsonError = nil;
-		NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+		NSError* jsonError = nil;
+		NSDictionary* json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
 		if (jsonError)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^
@@ -220,7 +220,7 @@
 			});
 			return;
 		}
-		NSArray *versionIds = json[@"data"];
+		NSArray* versionIds = json[@"data"];
 		if (versionIds.count == 0)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^
@@ -231,15 +231,15 @@
 		}
 		dispatch_async(dispatch_get_main_queue(), ^
 		{
-			MFSVersionPickerViewController *picker = [[MFSVersionPickerViewController alloc] initWithVersions:versionIds completion:^(NSDictionary *selectedVersion)
+			MFSVersionPickerViewController* picker = [[MFSVersionPickerViewController alloc] initWithVersions:versionIds completion:^(NSDictionary* selectedVersion)
 			{
 				[self downloadAppWithAppId:appId versionId:[selectedVersion[@"external_identifier"] longLongValue]];
 			}];
-			UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:picker];
+			UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:picker];
 			nav.modalPresentationStyle = UIModalPresentationFormSheet;
 			if (@available(iOS 15.0, *))
 			{
-				UISheetPresentationController *sheet = nav.sheetPresentationController;
+				UISheetPresentationController* sheet = nav.sheetPresentationController;
 				sheet.detents = @[UISheetPresentationControllerDetent.mediumDetent, UISheetPresentationControllerDetent.largeDetent];
 				sheet.prefersGrabberVisible = YES;
 			}
@@ -253,19 +253,19 @@
 {
 	dispatch_async(dispatch_get_main_queue(), ^
 	{
-		UIAlertController *versionAlert = [UIAlertController alertControllerWithTitle:@"Version ID" message:@"Enter the version ID of the app you want to download" preferredStyle:UIAlertControllerStyleAlert];
-		[versionAlert addTextFieldWithConfigurationHandler:^(UITextField *textField)
+		UIAlertController* versionAlert = [UIAlertController alertControllerWithTitle:@"Version ID" message:@"Enter the version ID of the app you want to download" preferredStyle:UIAlertControllerStyleAlert];
+		[versionAlert addTextFieldWithConfigurationHandler:^(UITextField* textField)
 		{
 			textField.placeholder = @"Version ID";
 			textField.keyboardType = UIKeyboardTypeNumberPad;
 		}];
-		UIAlertAction *downloadAction = [UIAlertAction actionWithTitle:@"Download" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action)
+		UIAlertAction* downloadAction = [UIAlertAction actionWithTitle:@"Download" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 		{
 			long long versionId = [versionAlert.textFields.firstObject.text longLongValue];
 			[self downloadAppWithAppId:appId versionId:versionId];
 		}];
 		[versionAlert addAction:downloadAction];
-		UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+		UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 		[versionAlert addAction:cancelAction];
 		[self presentViewController:versionAlert animated:YES completion:nil];
 	});
@@ -275,18 +275,18 @@
 {
 	dispatch_async(dispatch_get_main_queue(), ^
 	{
-		UIAlertController *promptAlert = [UIAlertController alertControllerWithTitle:@"Version Selection" message:@"Choose how to select the app version to download." preferredStyle:UIAlertControllerStyleAlert];
-		UIAlertAction *serverAction = [UIAlertAction actionWithTitle:@"Browse Version List" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action)
+		UIAlertController* promptAlert = [UIAlertController alertControllerWithTitle:@"Version Selection" message:@"Choose how to select the app version to download." preferredStyle:UIAlertControllerStyleAlert];
+		UIAlertAction* serverAction = [UIAlertAction actionWithTitle:@"Browse Version List" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 		{
 			[self getAllAppVersionIdsFromServer:appId];
 		}];
 		[promptAlert addAction:serverAction];
-		UIAlertAction *manualAction = [UIAlertAction actionWithTitle:@"Enter Version ID Manually" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action)
+		UIAlertAction* manualAction = [UIAlertAction actionWithTitle:@"Enter Version ID Manually" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 		{
 			[self promptForVersionId:appId];
 		}];
 		[promptAlert addAction:manualAction];
-		UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+		UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 		[promptAlert addAction:cancelAction];
 		[self presentViewController:promptAlert animated:YES completion:nil];
 	});
@@ -300,11 +300,11 @@
 		return;
 	}
 	[self showDownloadProgressWithMessage:@"Initiating download…"];
-	NSString *adamId = [NSString stringWithFormat:@"%lld", appId];
-	NSString *pricingParameters = @"pricingParameter";
-	NSString *appExtVrsId = [NSString stringWithFormat:@"%lld", versionId];
-	NSString *installed = @"0";
-	NSString *offerString = nil;
+	NSString* adamId = [NSString stringWithFormat:@"%lld", appId];
+	NSString* pricingParameters = @"pricingParameter";
+	NSString* appExtVrsId = [NSString stringWithFormat:@"%lld", versionId];
+	NSString* installed = @"0";
+	NSString* offerString = nil;
 	if (versionId == 0)
 	{
 		offerString = [NSString stringWithFormat:@"productType=C&price=0&salableAdamId=%@&pricingParameters=%@&clientBuyId=1&installed=%@&trolled=1", adamId, pricingParameters, installed];
@@ -313,18 +313,18 @@
 	{
 		offerString = [NSString stringWithFormat:@"productType=C&price=0&salableAdamId=%@&pricingParameters=%@&appExtVrsId=%@&clientBuyId=1&installed=%@&trolled=1", adamId, pricingParameters, appExtVrsId, installed];
 	}
-	NSDictionary *offerDict = @{@"buyParams": offerString};
-	NSDictionary *itemDict = @{@"_itemOffer": adamId};
-	SKUIItemOffer *offer = [[SKUIItemOffer alloc] initWithLookupDictionary:offerDict];
-	SKUIItem *item = [[SKUIItem alloc] initWithLookupDictionary:itemDict];
+	NSDictionary* offerDict = @{@"buyParams": offerString};
+	NSDictionary* itemDict = @{@"_itemOffer": adamId};
+	SKUIItemOffer* offer = [[SKUIItemOffer alloc] initWithLookupDictionary:offerDict];
+	SKUIItem* item = [[SKUIItem alloc] initWithLookupDictionary:itemDict];
 	[item setValue:offer forKey:@"_itemOffer"];
 	[item setValue:@"iosSoftware" forKey:@"_itemKindString"];
 	if (versionId != 0)
 	{
 		[item setValue:@(versionId) forKey:@"_versionIdentifier"];
 	}
-	SKUIItemStateCenter *center = [SKUIItemStateCenter defaultCenter];
-	NSArray *items = @[item];
+	SKUIItemStateCenter* center = [SKUIItemStateCenter defaultCenter];
+	NSArray* items = @[item];
 	dispatch_async(dispatch_get_main_queue(), ^
 	{
 		[self showDownloadProgressWithMessage:@"Purchase request sent. The download will begin in the background."];
@@ -335,23 +335,23 @@
 	});
 }
 
-- (void)downloadAppWithLink:(NSString *)link
+- (void)downloadAppWithLink:(NSString*)link
 {
 	if (![self isNetworkReachable])
 	{
 		[self showAlert:@"No Internet" message:@"Please check your internet connection and try again."];
 		return;
 	}
-	NSString *targetAppIdParsed = nil;
+	NSString* targetAppIdParsed = nil;
 	if ([link containsString:@"id"])
 	{
-		NSArray *components = [link componentsSeparatedByString:@"id"];
+		NSArray* components = [link componentsSeparatedByString:@"id"];
 		if (components.count < 2)
 		{
 			[self showAlert:@"Error" message:@"Invalid link"];
 			return;
 		}
-		NSArray *idComponents = [components[1] componentsSeparatedByString:@"?"];
+		NSArray* idComponents = [components[1] componentsSeparatedByString:@"?"];
 		targetAppIdParsed = idComponents[0];
 	}
 	else
@@ -367,17 +367,17 @@
 
 - (void)downloadApp
 {
-	UIAlertController *linkAlert = [UIAlertController alertControllerWithTitle:@"App Link" message:@"Enter the App Store link to the app you want to download" preferredStyle:UIAlertControllerStyleAlert];
-	[linkAlert addTextFieldWithConfigurationHandler:^(UITextField *textField)
+	UIAlertController* linkAlert = [UIAlertController alertControllerWithTitle:@"App Link" message:@"Enter the App Store link to the app you want to download" preferredStyle:UIAlertControllerStyleAlert];
+	[linkAlert addTextFieldWithConfigurationHandler:^(UITextField* textField)
 	{
 		textField.placeholder = @"https://apps.apple.com/app/idXXXXXXXXX";
 	}];
-	UIAlertAction *downloadAction = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action)
+	UIAlertAction* downloadAction = [UIAlertAction actionWithTitle:@"Continue" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 	{
 		[self downloadAppWithLink:linkAlert.textFields.firstObject.text];
 	}];
 	[linkAlert addAction:downloadAction];
-	UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+	UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 	[linkAlert addAction:cancelAction];
 	[self presentViewController:linkAlert animated:YES completion:nil];
 }
