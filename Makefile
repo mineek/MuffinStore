@@ -11,7 +11,7 @@ include $(THEOS)/makefiles/common.mk
 APPLICATION_NAME = MuffinStore
 
 MuffinStore_FILES = $(wildcard *.m)
-MuffinStore_FRAMEWORKS = UIKit CoreGraphics CoreServices
+MuffinStore_FRAMEWORKS = UIKit CoreGraphics CoreServices SystemConfiguration
 MuffinStore_PRIVATE_FRAMEWORKS = Preferences StoreKitUI
 MuffinStore_CFLAGS = -fobjc-arc
 MuffinStore_CODESIGN_FLAGS = -Sentitlements.plist
