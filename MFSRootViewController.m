@@ -142,7 +142,7 @@
 
 - (NSString*)getAboutText
 {
-	return @"MuffinStore v1.2\nMade by Mineek\nhttps://github.com/mineek/MuffinStore";
+	return @"MuffinStore v1.3\nMade by Mineek\nhttps://github.com/mineek/MuffinStore";
 }
 
 - (void)showAlert:(NSString*)title message:(NSString*)message
@@ -239,9 +239,18 @@
 			nav.modalPresentationStyle = UIModalPresentationFormSheet;
 			if (@available(iOS 15.0, *))
 			{
-				UISheetPresentationController* sheet = nav.sheetPresentationController;
-				sheet.detents = @[UISheetPresentationControllerDetent.mediumDetent, UISheetPresentationControllerDetent.largeDetent];
-				sheet.prefersGrabberVisible = YES;
+					id sheet = [nav performSelector:@selector(sheetPresentationController)];
+					Class detentClass = NSClassFromString(@"UISheetPresentationControllerDetent");
+					if (sheet && detentClass)
+					{
+						id medium = [detentClass performSelector:@selector(mediumDetent)];
+						id large = [detentClass performSelector:@selector(largeDetent)];
+						if (medium && large)
+						{
+							[sheet setValue:@[medium, large] forKey:@"detents"];
+							[sheet setValue:@YES forKey:@"prefersGrabberVisible"];
+						}
+					}
 			}
 			[self presentViewController:nav animated:YES completion:nil];
 		});
